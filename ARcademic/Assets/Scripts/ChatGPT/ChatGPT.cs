@@ -26,8 +26,7 @@ namespace OpenAI
         private void Start()
         {
             button.onClick.AddListener(SendReply);
-            //RuntimeText.WriteString("Hello class today we are learning about animals the first think about animals that they have 4 legs another fact about animals is that they are living beings", "testin");
-            rawNotes = "'" + RuntimeText.ReadString() + "'"; // reads from Application.persistentDataPath + "/testin";
+            rawNotes = "'" + RuntimeText.ReadString() + "'";
             SendReply();
         }
 
