@@ -703,6 +703,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unlitMaterial: {fileID: 2100000, guid: 74c8ebaaf954cf247b5339641e238695, type: 2}
+  tess: {fileID: 0}
   outputImage: {fileID: 282187630}
   imageToRecognize: {fileID: 0}
 --- !u!4 &967313359
@@ -766,7 +767,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unlitMaterial: {fileID: 2100000, guid: cd2a4e83d7e5f794b838d2be16156307, type: 2}
-  outputImage: {fileID: 0}
+  tess: {fileID: 1177080324}
+  outputImage: {fileID: 282187630}
   imageToRecognize: {fileID: 0}
 --- !u!114 &1177080324
 MonoBehaviour:
@@ -777,14 +779,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1177080321}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed28055ca20f6e64fb909bf68782335a, type: 3}
+  m_Script: {fileID: 11500000, guid: 49c1e09faa8d5bd4a8308ce802b05c6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imageToRecognize: {fileID: 2800000, guid: 8adb1169a56c58b4f9c11cd7fd710501, type: 3}
+  imageToRecognize: {fileID: 2800000, guid: 15abe54fada5be948a67970383624579, type: 3}
   displayText: {fileID: 843257501}
   outputImage: {fileID: 282187630}
-  _text: 
-  _texture: {fileID: 0}
 --- !u!1 &1339969869
 GameObject:
   m_ObjectHideFlags: 0
@@ -1205,7 +1205,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 967313358}
+      - m_Target: {fileID: 1177080323}
         m_TargetAssemblyTypeName: ScreenshotHandler, Assembly-CSharp
         m_MethodName: TakePicture
         m_Mode: 1
