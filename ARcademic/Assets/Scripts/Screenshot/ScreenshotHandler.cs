@@ -15,7 +15,7 @@ public class ScreenshotHandler : MonoBehaviour
     [SerializeField]
     Material unlitMaterial;
     // [SerializeField]
-    // TesseractDemoScript tess;
+    TesseractScript tess;
     [SerializeField]
     RawImage outputImage;
     [SerializeField] 
@@ -131,7 +131,8 @@ public class ScreenshotHandler : MonoBehaviour
     public void SetImageToRecognize(Texture2D img)
     {
         imageToRecognize = img;
-        SetImageDisplay();
+        tess.SetImageToRecognize(imageToRecognize);
+        //SetImageDisplay();
     }
 
     private void SetImageDisplay()

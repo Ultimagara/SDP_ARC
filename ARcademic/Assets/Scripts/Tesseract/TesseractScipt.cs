@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TesseractDemoScript : MonoBehaviour
+public class TesseractScript : MonoBehaviour
 {
     [SerializeField] private Texture2D imageToRecognize;
     [SerializeField] private Text displayText;
@@ -9,6 +9,12 @@ public class TesseractDemoScript : MonoBehaviour
     private TesseractDriver _tesseractDriver;
     private string _text = "";
     private Texture2D _texture;
+
+    public void SetImageToRecognize(Texture2D img)
+    {
+        imageToRecognize = img;
+        Startup();
+    }
 
     private void Start()
     {
