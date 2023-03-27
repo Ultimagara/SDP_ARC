@@ -14,8 +14,8 @@ public class ScreenshotHandler : MonoBehaviour
     Resolution cameraResolution;
     [SerializeField]
     Material unlitMaterial;
-    // [SerializeField]
-    // TesseractDemoScript tess;
+    [SerializeField]
+    TesseractDemoScript tess;
     [SerializeField]
     RawImage outputImage;
     [SerializeField] 
@@ -102,7 +102,7 @@ public class ScreenshotHandler : MonoBehaviour
         //byte[] bytes = tex.EncodeToPNG();
         //Object.Destroy(tex);
 
-        /*tess.*/SetImageToRecognize(targetTexture);
+        tess.SetImageToRecognize(targetTexture);
 
         // For testing purposes, also write to a file in the project folder
         //File.WriteAllBytes("C:/SavedScreen.png", bytes);
@@ -131,6 +131,7 @@ public class ScreenshotHandler : MonoBehaviour
     public void SetImageToRecognize(Texture2D img)
     {
         imageToRecognize = img;
+        //tess.SetImageToRecognize(imageToRecognize);
         SetImageDisplay();
     }
 
