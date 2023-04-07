@@ -6,6 +6,7 @@ public class TesseractDemoScript : MonoBehaviour
     [SerializeField] private Texture2D imageToRecognize;
     [SerializeField] private Text displayText;
     [SerializeField] private RawImage outputImage;
+    [SerializeField] private DigitalRuby.SimpleLUT.SimpleLUT simpleLUT; 
     private TesseractDriver _tesseractDriver;
     private string _text = "";
     private Texture2D _texture;
@@ -18,7 +19,7 @@ public class TesseractDemoScript : MonoBehaviour
 
     private void Start()
     {
-        Startup();
+        //Startup();
     }
 
     private void Startup()
@@ -26,8 +27,8 @@ public class TesseractDemoScript : MonoBehaviour
         Texture2D texture = new Texture2D(imageToRecognize.width, imageToRecognize.height, TextureFormat.ARGB32, false);
         texture.SetPixels32(imageToRecognize.GetPixels32());
         texture.Apply();
-
         _tesseractDriver = new TesseractDriver();
+        _tesseractDriver.SetLUT(simpleLUT);
         Recoginze(texture);
     }
 

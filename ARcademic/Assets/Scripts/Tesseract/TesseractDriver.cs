@@ -4,12 +4,19 @@ using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
+using Unity.Collections;
 
 public class TesseractDriver
 {
+    private DigitalRuby.SimpleLUT.SimpleLUT simpleLUT; 
     private TesseractWrapper _tesseract;
     private static readonly List<string> fileNames = new List<string> { "tessdata.tgz" };
 
+    public void SetLUT(DigitalRuby.SimpleLUT.SimpleLUT newLUT)
+    {
+        simpleLUT = newLUT;
+    }
+    
     public string CheckTessVersion()
     {
         _tesseract = new TesseractWrapper();
@@ -102,12 +109,37 @@ public class TesseractDriver
 
     public string Recognize(Texture2D imageToRecognize)
     {
+        // return _tesseract.Recognize(simpleLUT.UpdateLUTTexture(imageToRecognize));
         return _tesseract.Recognize(imageToRecognize);
+
     }
 
     public Texture2D GetHighlightedTexture()
     {
         return _tesseract.GetHighlightedTexture();
+    }
+
+    public Texture2D ConvertToGrayScale(Texture2D thisTexture)
+    {
+        Texture2D tex = thisTexture;//thisTexture is ARGB32 renders correctly
+
+        //convert texture
+        NativeArray<byte> bytes = tex.GetRawTextureData<byte>();
+        for (int i=0; i<bytes.Length; i+=4)
+        {
+            byte gray = (byte)(0.2126f * bytes[i+1] + 0.7152f * bytes[i+2] + 0.0722f * bytes[i+3]);
+            bytes[i+3] = bytes[i+2] = bytes[i+1] = gray;
+        }
+        tex.Apply();
+        
+        return tex;
+    }
+
+    public Texture2D UpscaleImage(Texture2D thisTexture, int scaleFactor=2)
+    {
+        Texture2D tex = thisTexture;//thisTexture is ARGB32 renders correctly        var newTex = Instantiate (tex);
+        TextureScale.Bilinear (tex, thisTexture.width*scaleFactor, thisTexture.height*scaleFactor);
+        return tex; 
     }
 
     private void UnZipData(string fileName)
