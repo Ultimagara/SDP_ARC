@@ -17,6 +17,9 @@ public class VoskSpeechToText : MonoBehaviour
     [Tooltip("Location of the model, relative to the Streaming Assets folder.")]
     public string ModelPath = "";
 
+    [Tooltip("Location of the profile, relative to the Streaming Assets folder.")]
+    public string ProfilePath = "";
+
     [Tooltip("The source of the microphone input.")]
 
     public VoiceProcessor VoiceProcessor;
@@ -113,9 +116,10 @@ public class VoskSpeechToText : MonoBehaviour
     /// </summary>
     /// <param name="keyPhrases">A list of keywords/phrases. Keywords need to exist in the models dictionary, so some words like "webview" are better detected as two more common words "web view".</param>
     /// <param name="modelPath">The path to the model folder relative to StreamingAssets. If the path has a .zip ending, it will be decompressed into the application data persistent folder.</param>
+    /// <param name="profilePath">The path to the profile folder relative to StreamingAssets. Without Kaldi integration this should be an .fst file.</param>
     /// <param name="startMicrophone">"Should the microphone after vosk initializes?</param>
     /// <param name="maxAlternatives">The maximum number of alternative phrases detected</param>
-    public void StartVoskStt( List<string> keyPhrases= null, string modelPath = default, bool startMicrophone = false, int maxAlternatives = 3)
+    public void StartVoskStt( List<string> keyPhrases= null, string modelPath = default, string profilePath = default, bool startMicrophone = false, int maxAlternatives = 3)
     {
         if (_isInitializing)
         {
@@ -131,6 +135,11 @@ public class VoskSpeechToText : MonoBehaviour
         if (!string.IsNullOrEmpty(modelPath))
         {
             ModelPath = modelPath;
+        }
+
+        if (!string.IsNullOrEmpty(profilePath))
+        {
+            ProfilePath = profilePath;
         }
 
         if (keyPhrases != null)
@@ -149,6 +158,8 @@ public class VoskSpeechToText : MonoBehaviour
         yield return WaitForMicrophoneInput();
 
         yield return Decompress();
+
+        yield return SetProfile();
 
         OnStatusUpdated?.Invoke("Loading Model from: " + _decompressedModelPath);
         Vosk.Vosk.SetLogLevel(0);
@@ -247,6 +258,50 @@ public class VoskSpeechToText : MonoBehaviour
         yield return new WaitForSeconds(1);
         //Dispose the zipfile reader.
         zipFile.Dispose();
+    }
+
+    private IEnumerator SetProfile()
+    {
+        if (!Path.HasExtension(ProfilePath))
+        {
+            OnStatusUpdated?.Invoke("Profile failed to load, using default profile.");
+            Debug.Log(Path.Combine(Application.streamingAssetsPath, ProfilePath));
+            yield break;
+        }
+
+        OnStatusUpdated?.Invoke("Loading Profile...");
+        string dataPath = Path.Combine(Application.streamingAssetsPath, ProfilePath);
+
+        Stream dataStream;
+        // Read data from the streaming assets path. You cannot access the streaming assets directly on Android.
+        if (dataPath.Contains("://"))
+        {
+            UnityWebRequest www = UnityWebRequest.Get(dataPath);
+            www.SendWebRequest();
+            while (!www.isDone)
+            {
+                yield return null;
+            }
+            dataStream = new MemoryStream(www.downloadHandler.data);
+        }
+        // Read the file directly on valid platforms.
+        else
+        {
+            dataStream = File.OpenRead(dataPath);
+        }
+
+        // Convert the filestream into a byte array that can then be written into the persistent data path
+        byte[] dataBytes = new byte[dataStream.Length];
+        dataStream.Read(dataBytes, 0, dataBytes.Length);
+
+        string destFilePath = Path.Combine(_decompressedModelPath, @"graph\GR.fst");
+
+        File.WriteAllBytes(destFilePath, dataBytes);
+
+        //Update status text
+        OnStatusUpdated?.Invoke("Profile Initialized!");
+        //Wait a second in case we need to initialize another object.
+        yield return new WaitForSeconds(1);
     }
 
     ///The function that is called when the zip file extraction process is updated.
