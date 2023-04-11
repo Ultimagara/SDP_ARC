@@ -18,6 +18,8 @@ public class ScreenshotHandler : MonoBehaviour
     TesseractDemoScript tess;
     [SerializeField]
     RawImage outputImage;
+    [SerializeField]
+    LiveWebcam liveWebcam;
     [SerializeField] 
     private Texture2D imageToRecognize;
 
@@ -31,6 +33,14 @@ public class ScreenshotHandler : MonoBehaviour
 
     private void StartProcess()
     {
+        if (!liveWebcam.isOn)
+        {
+            liveWebcam.ToggleCamera();
+            return;
+        }
+        outputImage.texture = liveWebcam._rawImage.texture;
+        liveWebcam.ToggleCamera();
+
         cameraResolution = UnityEngine.Windows.WebCam.PhotoCapture.SupportedResolutions.OrderByDescending((res) => res.width * res.height).First();
         targetTexture = new Texture2D(cameraResolution.width, cameraResolution.height);
 
@@ -142,6 +152,7 @@ public class ScreenshotHandler : MonoBehaviour
         textureRes.Apply();
 
         outputImage.texture = textureRes;
+        liveWebcam.ToggleCamera();
     }
 
 }
