@@ -849,6 +849,7 @@ MonoBehaviour:
   outputImage: {fileID: 282187630}
   liveWebcam: {fileID: 0}
   imageToRecognize: {fileID: 0}
+  takePictureButton: {fileID: 0}
 --- !u!4 &967313359
 Transform:
   m_ObjectHideFlags: 0
@@ -914,6 +915,7 @@ MonoBehaviour:
   outputImage: {fileID: 282187630}
   liveWebcam: {fileID: 910802305}
   imageToRecognize: {fileID: 0}
+  takePictureButton: {fileID: 1742840562}
 --- !u!114 &1177080324
 MonoBehaviour:
   m_ObjectHideFlags: 0

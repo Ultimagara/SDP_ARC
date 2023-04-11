@@ -22,6 +22,8 @@ public class ScreenshotHandler : MonoBehaviour
     LiveWebcam liveWebcam;
     [SerializeField] 
     private Texture2D imageToRecognize;
+    [SerializeField] 
+    private Button takePictureButton;
 
 
     // Use this for initialization
@@ -33,9 +35,11 @@ public class ScreenshotHandler : MonoBehaviour
 
     private void StartProcess()
     {
+        takePictureButton.interactable = false;
         if (!liveWebcam.isOn)
         {
             liveWebcam.ToggleCamera();
+            takePictureButton.interactable = true;
             return;
         }
         outputImage.texture = liveWebcam._rawImage.texture;
@@ -89,6 +93,7 @@ public class ScreenshotHandler : MonoBehaviour
 
         // Deactivate our camera
         photoCaptureObject.StopPhotoModeAsync(OnStoppedPhotoMode);
+        takePictureButton.interactable = true;
     }
 
     private IEnumerator StartPNG()
@@ -152,7 +157,6 @@ public class ScreenshotHandler : MonoBehaviour
         textureRes.Apply();
 
         outputImage.texture = textureRes;
-        liveWebcam.ToggleCamera();
     }
 
 }
