@@ -1,12 +1,17 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace OpenAI
 {
     public class ChatGPT : MonoBehaviour
     {
-        [SerializeField] private Button button; // TODO: Remove for final product
+        public Button button;
+        public List<string> voskOutputFileNames;
+        public List<string> tesseractOutputFileNames;
+        public string texOutputFileName;
+        public string htmlOutputFileName;
 
         private OpenAIApi openai = new OpenAIApi();
         private string startPrompt = "Organize the following text into concise, LaTeX formatted notes. The notes should be in a list " +
@@ -16,110 +21,170 @@ namespace OpenAI
             "grammar. Do not include repetitive information. Do not type anything else after or before the Latex:";
         private string endPrompt = "I will give you two LaTeX formatted notes for class. Merge them into one LaTeX document, " +
             "organizing the information in a logical manner. Do not repeat information.";
+        private string htmlPrompt = "Make the following Latex into HTML.Be sure to include tags for a proper HTML site, such " +
+            "as doctype and body. Have the <title> tag be 'ARcademic Notes'. Include basic css " +
+            "to make the text look like good, readable notes. Do not type anything before or after the HTML:";
 
-        public async void ConvertTextFilesToLatex(string textFileName, string speechFileName, string outputFileName)
+        public async void GenerateLatex(List<string> tesseractFileNames, List<string> voskFileNames)
         {
-            string textResponse = "";
-            string speechResponse = "";
+            List<string> fileNames = tesseractFileNames;
+            foreach (string voskFile in voskFileNames)
+            {
+                fileNames.Add(voskFile);
+            }
 
-            // Get the text from the files
-            string textData = FileIO.ReadString(textFileName);
-            string speechData = FileIO.ReadString(speechFileName);
-
-            // Create the first message to send to GPT
+            /****************************** CONVERT EACH FILE INTO LATEX ******************************/
+            List<string> latexOutputs = new List<string>();
             List<ChatMessage> messages = new List<ChatMessage>();
-            var newMessage = new ChatMessage();
-            newMessage.Role = "user";
-            newMessage.Content = startPrompt + "\n\"" + textData + "\"";
-
-            messages.Add(newMessage);
-
-            Debug.Log("sending first message");
-            // Send the message and await a response
-            var completionResponse = await openai.CreateChatCompletion(new CreateChatCompletionRequest()
+            foreach (string file in fileNames)
             {
-                Model = "gpt-3.5-turbo-0301",
-                Messages = messages
-            });
+                string textResponse = "";
 
-            if (completionResponse.Choices != null && completionResponse.Choices.Count > 0)
-            {
-                var message = completionResponse.Choices[0].Message;
-                message.Content = message.Content.Trim();
-                textResponse = message.Content;
+                // Get the text from the files
+                string textData = FileIO.ReadString(file);
+
+                // Create the message to send to GPT
+                var newMessage = new ChatMessage();
+                newMessage.Role = "user";
+                newMessage.Content = startPrompt + "\n\"" + textData + "\"";
+
+                messages.Add(newMessage);
+
+                // Send the message and await a response
+                var completionResponse = await openai.CreateChatCompletion(new CreateChatCompletionRequest()
+                {
+                    Model = "gpt-3.5-turbo-0301",
+                    Messages = messages
+                });
+
+                if (completionResponse.Choices != null && completionResponse.Choices.Count > 0)
+                {
+                    var message = completionResponse.Choices[0].Message;
+                    message.Content = message.Content.Trim();
+                    textResponse = message.Content;
+                }
+                else
+                {
+                    Debug.LogWarning("No text was generated from this prompt.");
+                }
+                latexOutputs.Add(textResponse);
+                messages.Remove(newMessage);
             }
+            /***************************************************************************/
+
+
+            /****************************** MERGE THE FIRST TWO LATEX FILES ******************************/
+            var merged = "";
+            if (latexOutputs.Count > 1)
+            {
+                var newMessage = new ChatMessage();
+                newMessage.Role = "user";
+                newMessage.Content = endPrompt + "\nDocument 1:\n" + latexOutputs[0] + "\n\nDocument 2:\n" + latexOutputs[1];
+
+                messages.Add(newMessage);
+
+                // Send the message and await a response
+                var completionResponse = await openai.CreateChatCompletion(new CreateChatCompletionRequest()
+                {
+                    Model = "gpt-3.5-turbo-0301",
+                    Messages = messages
+                });
+
+                if (completionResponse.Choices != null && completionResponse.Choices.Count > 0)
+                {
+                    var message = completionResponse.Choices[0].Message;
+                    message.Content = message.Content.Trim();
+                    merged = message.Content;
+                }
+                else
+                {
+                    Debug.LogWarning("No text was generated from this prompt.");
+                }
+                messages.Remove(newMessage);
+            } 
             else
             {
-                Debug.LogWarning("No text was generated from this prompt.");
+                merged = latexOutputs[0];
             }
+            /***************************************************************************/
 
-            messages.Remove(newMessage);
 
-            Debug.Log("sending second message");
-            // Create the second message to send to GPT
-            newMessage = new ChatMessage();
-            newMessage.Role = "user";
-            newMessage.Content = startPrompt + "\n\"" + speechData + "\"";
-
-            messages.Add(newMessage);
-
-            // Send the message and await a response
-            completionResponse = await openai.CreateChatCompletion(new CreateChatCompletionRequest()
+            /****************************** MERGE THE REMAINING LATEX FILES ******************************/
+            for (int i = 2; i < latexOutputs.Count; i++)
             {
-                Model = "gpt-3.5-turbo-0301",
-                Messages = messages
-            });
+                var newMessage = new ChatMessage();
+                newMessage.Role = "user";
+                newMessage.Content = endPrompt + "\nDocument 1:\n" + merged + "\n\nDocument 2:\n" + latexOutputs[i];
 
-            if (completionResponse.Choices != null && completionResponse.Choices.Count > 0)
-            {
-                var message = completionResponse.Choices[0].Message;
-                message.Content = message.Content.Trim();
-                //FileIO.WriteString(message.Content, outputFileName);
-                speechResponse = message.Content;
+                messages.Add(newMessage);
+
+                // Send the message and await a response
+                var completionResponse = await openai.CreateChatCompletion(new CreateChatCompletionRequest()
+                {
+                    Model = "gpt-3.5-turbo-0301",
+                    Messages = messages
+                });
+
+                if (completionResponse.Choices != null && completionResponse.Choices.Count > 0)
+                {
+                    var message = completionResponse.Choices[0].Message;
+                    message.Content = message.Content.Trim();
+                    merged = message.Content;
+                }
+                else
+                {
+                    Debug.LogWarning("No text was generated from this prompt.");
+                }
+                messages.Remove(newMessage);
             }
-            else
+            /***************************************************************************/
+
+            /****************************** CONVERT LATEX TO HTML ******************************/
+            string html = "";
+            for (int i = 0; i < 1; i ++)
             {
-                Debug.LogWarning("No text was generated from this prompt.");
+                var newMessage = new ChatMessage();
+                newMessage.Role = "user";
+                newMessage.Content = htmlPrompt + "\n\n" + merged;
+
+                messages.Add(newMessage);
+
+                // Send the message and await a response
+                var completionResponse = await openai.CreateChatCompletion(new CreateChatCompletionRequest()
+                {
+                    Model = "gpt-3.5-turbo-0301",
+                    Messages = messages
+                });
+
+                if (completionResponse.Choices != null && completionResponse.Choices.Count > 0)
+                {
+                    var message = completionResponse.Choices[0].Message;
+                    message.Content = message.Content.Trim();
+                    html = message.Content;
+                }
+                else
+                {
+                    Debug.LogWarning("No text was generated from this prompt.");
+                }
+                messages.Remove(newMessage);
             }
+            /***************************************************************************/
 
-            messages.Remove(newMessage);
-
-            // Create the final message to send to GPT
-            newMessage = new ChatMessage();
-            newMessage.Role = "user";
-            newMessage.Content = endPrompt + "\nDocument 1:\n" + textResponse + "\n\nDocument 2:\n" + speechResponse;
-
-            messages.Add(newMessage);
-
-            Debug.Log("sending final message");
-            // Send the message and await a response
-            completionResponse = await openai.CreateChatCompletion(new CreateChatCompletionRequest()
-            {
-                Model = "gpt-3.5-turbo-0301",
-                Messages = messages
-            });
-
-            if (completionResponse.Choices != null && completionResponse.Choices.Count > 0)
-            {
-                var message = completionResponse.Choices[0].Message;
-                message.Content = message.Content.Trim();
-                FileIO.WriteString(message.Content, outputFileName);
-            }
-            else
-            {
-                Debug.LogWarning("No text was generated from this prompt.");
-            }
-        }
-
-        private void Start()
-        {
-            button.onClick.AddListener(CallConvertFromButton);
+            /****************************** WRITE TO FILES ******************************/
+            FileIO.WriteString(merged, texOutputFileName);
+            FileIO.WriteString(html, htmlOutputFileName);
+            /***************************************************************************/
         }
 
         // Button listener can't have parameters. This is purely for testing and will be removed in final product.
-        private void CallConvertFromButton()
+        public void CallConvertFromButton()
         {
-            ConvertTextFilesToLatex("testTextData.txt", "testSpeechData.txt", "output.tex");
+            GenerateLatex(tesseractOutputFileNames, voskOutputFileNames);
+        }
+
+        public void OpenHTMLFile()
+        {
+            Application.OpenURL(Application.persistentDataPath + "/" + htmlOutputFileName);
         }
     }
 }
