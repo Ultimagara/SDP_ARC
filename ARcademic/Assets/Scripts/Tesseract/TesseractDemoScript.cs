@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -57,6 +59,13 @@ public class TesseractDemoScript : MonoBehaviour
         if (string.IsNullOrWhiteSpace(text)) return;
 
         _text += (string.IsNullOrWhiteSpace(displayText.text) ? "" : "\n") + text;
+
+        /* Temporary text add to file
+        string path = Application.persistentDataPath + "/recognizedText.txt";
+        Debug.Log("Writing to: " + path);
+        StreamWriter writer = new StreamWriter(path, true);
+        writer.WriteLine(text);
+        writer.Close(); */
 
         if (isError)
             Debug.LogError(text);
