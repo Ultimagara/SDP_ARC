@@ -15,7 +15,6 @@ public class FileIO : MonoBehaviour
     {
         string path = Application.persistentDataPath + "/" + fileName;
         Debug.Log("Reading from: " + path);
-        //Read the text from directly from the test.txt file
         StreamReader reader = new StreamReader(path);
         string toReturn = reader.ReadToEnd();
         reader.Close();
