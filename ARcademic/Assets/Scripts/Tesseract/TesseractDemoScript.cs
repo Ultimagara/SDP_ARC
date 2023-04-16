@@ -38,7 +38,7 @@ public class TesseractDemoScript : MonoBehaviour
     {
         _texture = outputTexture;
         ClearTextDisplay();
-        AddToTextDisplay(_tesseractDriver.CheckTessVersion());
+        _tesseractDriver.CheckTessVersion();
         _tesseractDriver.Setup(OnSetupCompleteRecognize);
     }
 
@@ -60,12 +60,12 @@ public class TesseractDemoScript : MonoBehaviour
 
         _text += (string.IsNullOrWhiteSpace(displayText.text) ? "" : "\n") + text;
 
-        /* Temporary text add to file
+        // Temporary text add to file
         string path = Application.persistentDataPath + "/recognizedText.txt";
         Debug.Log("Writing to: " + path);
         StreamWriter writer = new StreamWriter(path, true);
         writer.WriteLine(text);
-        writer.Close(); */
+        writer.Close();
 
         if (isError)
             Debug.LogError(text);
@@ -75,7 +75,7 @@ public class TesseractDemoScript : MonoBehaviour
 
     private void LateUpdate()
     {
-        displayText.text = _text;
+        displayText.text = "Tesseract Output:" + _text;
     }
 
     private void SetImageDisplay()
