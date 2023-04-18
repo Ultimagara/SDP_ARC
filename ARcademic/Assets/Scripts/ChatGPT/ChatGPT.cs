@@ -7,17 +7,18 @@ namespace OpenAI
 {
     public class ChatGPT : MonoBehaviour
     {
-        public Button button;
+        public Button htmlButton;
         public List<string> voskOutputFileNames;
         public List<string> tesseractOutputFileNames;
-        public string texOutputFileName;
-        public string htmlOutputFileName;
+        private static string outputFileName;
+        private static string texOutput = "";
+        private static bool shouldUpdateHtml = true;
 
-        private OpenAIApi openai = new OpenAIApi();
+        private OpenAIApi openai = new OpenAIApi("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");
         private string startPrompt = "Organize the following text into concise, LaTeX formatted notes. The notes should be in a list " +
             "if appropriate. Also, fix any spelling or grammatical errors. Be sure to include a section header and the proper document " +
             "begin and end tags. Use the article document class and the graphicx package. Separate the notes into multiple sections " +
-            "that best organize all of the information. Each individual note in itemized lists should be concise without caring about " +
+            "that best organize all of the information. Do not use too many sections. Each individual note in itemized lists should be concise without caring about " +
             "grammar. Do not include repetitive information. Do not type anything else after or before the Latex:";
         private string endPrompt = "I will give you two LaTeX formatted notes for class. Merge them into one LaTeX document, " +
             "organizing the information in a logical manner. Do not repeat information.";
@@ -27,7 +28,12 @@ namespace OpenAI
 
         public async void GenerateLatex(List<string> tesseractFileNames, List<string> voskFileNames)
         {
-            List<string> fileNames = tesseractFileNames;
+            htmlButton.interactable = false;
+            List<string> fileNames = new List<string>();
+            foreach (string tesseractFile in tesseractFileNames)
+            {
+                fileNames.Add(tesseractFile);
+            }
             foreach (string voskFile in voskFileNames)
             {
                 fileNames.Add(voskFile);
@@ -67,6 +73,7 @@ namespace OpenAI
                 {
                     Debug.LogWarning("No text was generated from this prompt.");
                 }
+                Debug.Log("Response generated.");
                 latexOutputs.Add(textResponse);
                 messages.Remove(newMessage);
             }
@@ -100,6 +107,7 @@ namespace OpenAI
                 {
                     Debug.LogWarning("No text was generated from this prompt.");
                 }
+                Debug.Log("Response generated.");
                 messages.Remove(newMessage);
             } 
             else
@@ -139,52 +147,68 @@ namespace OpenAI
             }
             /***************************************************************************/
 
-            /****************************** CONVERT LATEX TO HTML ******************************/
-            string html = "";
-            for (int i = 0; i < 1; i ++)
-            {
-                var newMessage = new ChatMessage();
-                newMessage.Role = "user";
-                newMessage.Content = htmlPrompt + "\n\n" + merged;
-
-                messages.Add(newMessage);
-
-                // Send the message and await a response
-                var completionResponse = await openai.CreateChatCompletion(new CreateChatCompletionRequest()
-                {
-                    Model = "gpt-3.5-turbo-0301",
-                    Messages = messages
-                });
-
-                if (completionResponse.Choices != null && completionResponse.Choices.Count > 0)
-                {
-                    var message = completionResponse.Choices[0].Message;
-                    message.Content = message.Content.Trim();
-                    html = message.Content;
-                }
-                else
-                {
-                    Debug.LogWarning("No text was generated from this prompt.");
-                }
-                messages.Remove(newMessage);
-            }
-            /***************************************************************************/
 
             /****************************** WRITE TO FILES ******************************/
-            FileIO.WriteString(merged, texOutputFileName);
-            FileIO.WriteString(html, htmlOutputFileName);
+            texOutput = string.Copy(merged);
+            outputFileName = System.DateTime.Now.ToString("G").Replace(' ', '-').Replace('/', '-').Replace(':', '-');
+            shouldUpdateHtml = true;
+            htmlButton.interactable = true;
+            FileIO.WriteString(merged, outputFileName + ".tex");
             /***************************************************************************/
         }
+
+        public async void OpenHTML()
+        {
+            if (shouldUpdateHtml)
+            {
+                htmlButton.interactable = false;
+                shouldUpdateHtml = false;
+                /****************************** CONVERT LATEX TO HTML ******************************/
+                List<ChatMessage> messages = new List<ChatMessage>();
+                string html = "";
+                for (int i = 0; i < 1; i++)
+                {
+                    var newMessage = new ChatMessage();
+                    newMessage.Role = "user";
+                    newMessage.Content = htmlPrompt + "\n\n" + texOutput;
+
+                    messages.Add(newMessage);
+
+                    // Send the message and await a response
+                    var completionResponse = await openai.CreateChatCompletion(new CreateChatCompletionRequest()
+                    {
+                        Model = "gpt-3.5-turbo-0301",
+                        Messages = messages
+                    });
+
+                    if (completionResponse.Choices != null && completionResponse.Choices.Count > 0)
+                    {
+                        var message = completionResponse.Choices[0].Message;
+                        message.Content = message.Content.Trim();
+                        html = message.Content;
+                    }
+                    else
+                    {
+                        Debug.LogWarning("No text was generated from this prompt.");
+                    }
+                    messages.Remove(newMessage);
+                }
+                /***************************************************************************/
+
+                FileIO.WriteString(html, outputFileName + ".html");
+                htmlButton.interactable = true;
+            }
+
+            // Open the HTML file
+            Application.OpenURL(Application.persistentDataPath + "/" + outputFileName + ".html");
+        }
+
+
 
         // Button listener can't have parameters. This is purely for testing and will be removed in final product.
         public void CallConvertFromButton()
         {
             GenerateLatex(tesseractOutputFileNames, voskOutputFileNames);
-        }
-
-        public void OpenHTMLFile()
-        {
-            Application.OpenURL(Application.persistentDataPath + "/" + htmlOutputFileName);
         }
     }
 }
