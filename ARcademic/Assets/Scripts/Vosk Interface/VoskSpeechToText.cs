@@ -17,12 +17,9 @@ public class VoskSpeechToText : MonoBehaviour
     [Tooltip("Location of the model, relative to the Streaming Assets folder.")]
     public string ModelPath = "";
 
-    [Tooltip("Location of the profile, relative to the Streaming Assets folder.")]
-    public string ProfilePath = "";
-
     [Tooltip("The source of the microphone input.")]
-
     public VoiceProcessor VoiceProcessor;
+
     [Tooltip("The Max number of alternatives that will be processed.")]
     public int MaxAlternatives = 3;
 
@@ -116,10 +113,9 @@ public class VoskSpeechToText : MonoBehaviour
     /// </summary>
     /// <param name="keyPhrases">A list of keywords/phrases. Keywords need to exist in the models dictionary, so some words like "webview" are better detected as two more common words "web view".</param>
     /// <param name="modelPath">The path to the model folder relative to StreamingAssets. If the path has a .zip ending, it will be decompressed into the application data persistent folder.</param>
-    /// <param name="profilePath">The path to the profile folder relative to StreamingAssets. Without Kaldi integration this should be an .fst file.</param>
     /// <param name="startMicrophone">"Should the microphone after vosk initializes?</param>
     /// <param name="maxAlternatives">The maximum number of alternative phrases detected</param>
-    public void StartVoskStt( List<string> keyPhrases= null, string modelPath = default, string profilePath = default, bool startMicrophone = false, int maxAlternatives = 3)
+    public void StartVoskStt( List<string> keyPhrases= null, string modelPath = default, bool startMicrophone = false, int maxAlternatives = 3)
     {
         if (_isInitializing)
         {
@@ -135,11 +131,6 @@ public class VoskSpeechToText : MonoBehaviour
         if (!string.IsNullOrEmpty(modelPath))
         {
             ModelPath = modelPath;
-        }
-
-        if (!string.IsNullOrEmpty(profilePath))
-        {
-            ProfilePath = profilePath;
         }
 
         if (keyPhrases != null)
@@ -262,15 +253,16 @@ public class VoskSpeechToText : MonoBehaviour
 
     private IEnumerator SetProfile()
     {
-        if (!Path.HasExtension(ProfilePath))
+        if (!Path.HasExtension(ProfileController.selectedOption + ".fst"))
         {
             OnStatusUpdated?.Invoke("Profile failed to load, using default profile.");
-            Debug.Log(Path.Combine(Application.streamingAssetsPath, ProfilePath));
+            Debug.Log(Path.Combine(Application.streamingAssetsPath, ProfileController.selectedOption + ".fst"));
+            Debug.Log(ProfileController.selectedOption);
             yield break;
         }
 
         OnStatusUpdated?.Invoke("Loading Profile...");
-        string dataPath = Path.Combine(Application.streamingAssetsPath, ProfilePath);
+        string dataPath = Path.Combine(Application.streamingAssetsPath, ProfileController.selectedOption + ".fst");
 
         Stream dataStream;
         // Read data from the streaming assets path. You cannot access the streaming assets directly on Android.
