@@ -1491,14 +1491,14 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 637259223}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2109698651}
         m_TargetAssemblyTypeName: OpenAI.ChatGPT, Assembly-CSharp
-        m_MethodName: OpenHTMLFile
+        m_MethodName: OpenHTML
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4068,13 +4068,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcfe1c32fe63ff949815cad01d960366, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  button: {fileID: 897478636}
+  htmlButton: {fileID: 637259222}
   voskOutputFileNames:
   - speechTranspose.txt
   tesseractOutputFileNames:
   - recognizedText.txt
-  texOutputFileName: output.tex
-  htmlOutputFileName: output.html
 --- !u!4 &2109698652
 Transform:
   m_ObjectHideFlags: 0
