@@ -117,7 +117,8 @@ public class ScreenshotHandler : MonoBehaviour
         //byte[] bytes = tex.EncodeToPNG();
         //Object.Destroy(tex);
 
-        tess.SetImageToRecognize(targetTexture);
+        tess.SetImageToRecognize(targetTexture);// AdaptiveThreshold.AdaptiveThreshhold(targetTexture, 2, .5));
+        //SetImageToRecognize(targetTexture);
 
         // For testing purposes, also write to a file in the project folder
         //File.WriteAllBytes("C:/SavedScreen.png", bytes);
@@ -145,7 +146,7 @@ public class ScreenshotHandler : MonoBehaviour
 
     public void SetImageToRecognize(Texture2D img)
     {
-        imageToRecognize = img;
+        imageToRecognize = img;// AdaptiveThreshold.AdaptiveThreshhold(img, 1, 1);
         //tess.SetImageToRecognize(imageToRecognize);
         SetImageDisplay();
     }
