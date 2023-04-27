@@ -2713,9 +2713,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ModelPath: vosk-model-small-en-us-0.15.zip
+  ProfilePath: Profile 1.fst
   VoiceProcessor: {fileID: 1339969870}
   MaxAlternatives: 3
-  MaxRecordLength: 240
+  MaxRecordLength: 30
   AutoStart: 1
   KeyPhrases: []
 --- !u!4 &1339969872
