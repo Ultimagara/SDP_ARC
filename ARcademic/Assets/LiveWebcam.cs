@@ -19,6 +19,10 @@ public class LiveWebcam : MonoBehaviour
         StartCamera();
     }
 
+    public WebCamTexture GetWebCamTexture()
+    {
+        return camTex;
+    }
     private void StartCamera()
     {
         WebCamDevice[] devices = WebCamTexture.devices;

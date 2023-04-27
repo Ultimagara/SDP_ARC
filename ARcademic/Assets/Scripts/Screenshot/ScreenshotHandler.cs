@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using UnityEngine.Networking;
 using System.Collections;
 using System.IO;
@@ -22,9 +23,41 @@ public class ScreenshotHandler : MonoBehaviour
     private Texture2D imageToRecognize;
     [SerializeField] 
     private Button takePictureButton;
+    [SerializeField] 
+    public string deviceName;
+    [SerializeField] 
+    WebCamTexture wct;
 
 
-    // Use this for initialization
+   private void StartImageCapture() 
+   {
+        
+        // Create a gameobject that we can apply our texture to
+        GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        Renderer quadRenderer = quad.GetComponent<Renderer>() as Renderer;
+        quadRenderer.material = new Material(unlitMaterial);
+
+        // quad.transform.parent = this.transform;
+        // quad.transform.localPosition = new Vector3(0.0f, 0.0f, 3.0f);
+        // quad.name = "ImageTest";
+        // quadRenderer.material.SetTexture("_MainTex", outputImage.texture);
+        
+        WebCamDevice[] devices = WebCamTexture.devices;
+        deviceName = devices[0].name;
+        UnityEngine.Debug.Log("Screenshot using " + deviceName);
+        wct = liveWebcam.GetWebCamTexture();
+        // quadRenderer.material.SetTexture("_MainTex", wct);
+
+        targetTexture = new Texture2D(wct.width, wct.height);
+        targetTexture.SetPixels(wct.GetPixels());
+        targetTexture.Apply();
+
+        wct.Stop();
+
+        // targetTexture = (liveWebcam._rawImage.texture) as Texture2D;
+        // quadRenderer.material.SetTexture("_MainTex", targetTexture);
+
+   }
 
     public void TakePicture()
     {
@@ -40,27 +73,18 @@ public class ScreenshotHandler : MonoBehaviour
             takePictureButton.interactable = true;
             return;
         }
-        outputImage.texture = liveWebcam._rawImage.texture;
-        liveWebcam.ToggleCamera();
-
-        // Cleans up existing image(s)
+        
         foreach (Transform child in transform)
         {
             Destroy(child.gameObject);
         }
 
-        // Create a gameobject that we can apply our texture to
-        GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        Renderer quadRenderer = quad.GetComponent<Renderer>() as Renderer;
-        quadRenderer.material = new Material(unlitMaterial);
+        outputImage.texture = liveWebcam._rawImage.texture;
+        StartImageCapture();
+        liveWebcam.ToggleCamera();
 
-        quad.transform.parent = this.transform;
-        quad.transform.localPosition = new Vector3(0.0f, 0.0f, 3.0f);
-        quad.name = "ImageTest";
-        
-        targetTexture = (Texture2D)liveWebcam._rawImage.mainTexture;
+        // Cleans up existing image(s)
 
-        quadRenderer.material.SetTexture("_MainTex", outputImage.texture);
 
         StartCoroutine(StartPNG());
 
@@ -75,44 +99,14 @@ public class ScreenshotHandler : MonoBehaviour
 
     private IEnumerator UploadPNG(Texture2D tex)
     {
-        // We should only read the screen buffer after rendering is complete
         yield return new WaitForEndOfFrame();
 
-        // Encode texture into PNG
-        //byte[] bytes = tex.EncodeToPNG();
-        //Object.Destroy(tex);
-
-        tess.SetImageToRecognize(targetTexture);// AdaptiveThreshold.AdaptiveThreshhold(targetTexture, 2, .5));
-        //SetImageToRecognize(targetTexture);
-
-        // For testing purposes, also write to a file in the project folder
-        //File.WriteAllBytes("C:/SavedScreen.png", bytes);
-
-        /*
-        // Create a Web Form
-        WWWForm form = new WWWForm();
-        form.AddField("frameCount", Time.frameCount.ToString());
-        form.AddBinaryData("fileUpload", bytes);
-
-        // Upload to a cgi script
-        var w = UnityWebRequest.Post("http://localhost/cgi-bin/env.cgi?post", form);
-        yield return w.SendWebRequest();
-
-        if (w.result != UnityWebRequest.Result.Success)
-        {
-            Debug.Log(w.error);
-        }
-        else
-        {
-            Debug.Log("Finished Uploading Screenshot");
-        }
-        */
+        tess.SetImageToRecognize(targetTexture);
     }
 
     public void SetImageToRecognize(Texture2D img)
     {
-        imageToRecognize = img;// AdaptiveThreshold.AdaptiveThreshhold(img, 1, 1);
-        //tess.SetImageToRecognize(imageToRecognize);
+        imageToRecognize = img;
         SetImageDisplay();
     }
 
