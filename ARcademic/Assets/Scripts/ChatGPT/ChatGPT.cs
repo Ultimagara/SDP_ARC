@@ -14,7 +14,7 @@ namespace OpenAI
         private static string texOutput = "";
         private static bool shouldUpdateHtml = true;
 
-        private OpenAIApi openai = new OpenAIApi("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");
+        private OpenAIApi openai = new OpenAIApi("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", "org-rWSUdjtfYv7Yh9PTUD2jvks6");
         private string startPrompt = "Organize the following text into concise, LaTeX formatted notes. The notes should be in a list " +
             "if appropriate. Also, fix any spelling or grammatical errors. Be sure to include a section header and the proper document " +
             "begin and end tags. Use the article document class and the graphicx package. Separate the notes into multiple sections " +
