@@ -2067,12 +2067,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unlitMaterial: {fileID: 2100000, guid: 74c8ebaaf954cf247b5339641e238695, type: 2}
-  tess: {fileID: 1177080324}
+  tess: {fileID: 0}
   outputImage: {fileID: 282187630}
-  liveWebcam: {fileID: 910802305}
+  liveWebcam: {fileID: 0}
   imageToRecognize: {fileID: 0}
-  takePictureButton: {fileID: 1742840562}
-  deviceName: HD Web Camera
+  takePictureButton: {fileID: 0}
+  deviceName: 
   wct: {fileID: 0}
 --- !u!4 &967313359
 Transform:
@@ -2450,7 +2450,7 @@ MonoBehaviour:
   liveWebcam: {fileID: 910802305}
   imageToRecognize: {fileID: 0}
   takePictureButton: {fileID: 1742840562}
-  deviceName: HD Web Camera
+  deviceName: 
   wct: {fileID: 0}
 --- !u!114 &1177080324
 MonoBehaviour:
@@ -3393,6 +3393,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 444140450}
+        m_TargetAssemblyTypeName: PresenceInd, Assembly-CSharp
+        m_MethodName: CheckPresent
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 42583689}
         m_TargetAssemblyTypeName: UnityEngine.UI.Text, UnityEngine.UI
         m_MethodName: set_text
@@ -3403,30 +3415,6 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 'Action: Recording'
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1339969871}
-        m_TargetAssemblyTypeName: VoskSpeechToText, Assembly-CSharp
-        m_MethodName: ToggleRecording
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1522712392}
-        m_TargetAssemblyTypeName: RemoteToggle, Assembly-CSharp
-        m_MethodName: Toggle
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1661475486
@@ -3551,6 +3539,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 1105990046}
+        m_TargetAssemblyTypeName: PresenceInd, Assembly-CSharp
+        m_MethodName: CheckPresent
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 42583689}
         m_TargetAssemblyTypeName: UnityEngine.UI.Text, UnityEngine.UI
         m_MethodName: set_text
@@ -3561,30 +3561,6 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 'Action: Imaging'
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 967313358}
-        m_TargetAssemblyTypeName: ScreenshotHandler, Assembly-CSharp
-        m_MethodName: TakePicture
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 233704867}
-        m_TargetAssemblyTypeName: RemoteToggle, Assembly-CSharp
-        m_MethodName: Toggle
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1742840563
