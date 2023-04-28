@@ -8,13 +8,14 @@ public class PresenceInd : MonoBehaviour
     public CanvasGroup alphaTarget;
     public string targetFilename;
     public float defaultAlpha;
+    public float interval;
 
     void Start()
     {
-        CheckPresent();
+        InvokeRepeating("CheckPresent", 0, interval);
     }
 
-    public void CheckPresent()
+    void CheckPresent()
     {
         if (File.Exists(Application.persistentDataPath + "/" + targetFilename))
             alphaTarget.alpha = 1F;
